@@ -12,7 +12,6 @@ void backward(int t) {
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4,HIGH);
-  //delay(t);
   delayTill = millis() + t;
 }
 
@@ -21,7 +20,6 @@ void forward(int t) {
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4,LOW);
-  //delay(t);
   delayTill = millis() + t;
 }
 
@@ -38,7 +36,6 @@ void turnLeft(int t) {
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
-  //delay(t);
   delayTill = millis() + t;
 }
 
@@ -47,7 +44,6 @@ void turnRight(int t) {
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
-  //delay(t);
   delayTill = millis() + t;
 }
 
