@@ -3,12 +3,15 @@
 #include <math.h> 
 #include <string.h>
 
-// loads the tone library, needed for 
-TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
-
-// IR receiver on pin 4
+// sets pins
 #define irPin 4
 #define buzzerPin 9
+#define IN1  7  // K1 motor direction
+#define IN2  8  // K1 motor direction
+#define IN3  11 // K3 motor direction
+#define IN4  10 // K3 motor direction
+#define ENA  5  // Motor speed
+#define ENB  6  // Motor speed
 
 // IR codes for each numbered button
 #define IR_1 0x00FFA25D
@@ -32,6 +35,9 @@ TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
 // IRrecv object
 IRrecv IR(irPin);
 decode_results IRresults;
+
+// loads the tone library, needed for 
+TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
 
 // defaults for alarm time
 String alarm1 = "";
@@ -61,7 +67,10 @@ unsigned long msInSetCurrentTime = 0; // initial milliseconds in set current tim
 boolean alarmTriggered = false;
 boolean alarmSounding = false;
 
-void IRtick() {
+// keeps track of time for motor movement
+unsigned long delayTill = 0;
+
+void irTick() {
   if(IR.decode(&IRresults)) {
     if (IRresults.value==IR_1) {
       keyPressed("1");
@@ -119,6 +128,7 @@ void IRtick() {
     }
 }
 
+// alarm tone functions
 void startBeep() {
   tone1.tone (600);
   delay (100);
@@ -236,20 +246,124 @@ void alarmTick() {
     alarmTriggered = false;
 }
 
+// motor movement functions
+void backward(int t) {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4,HIGH);
+  delayTill = millis() + t;
+}
+
+void forward(int t) {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4,LOW);
+  delayTill = millis() + t;
+}
+
+void stopMotor() {
+  // motor brake 
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4,LOW);
+}
+
+void turnLeft(int t) {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  delayTill = millis() + t;
+}
+
+void turnRight(int t) {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  delayTill = millis() + t;
+}
+
+void setMotorSpeed(int lspeed,int rspeed) { 
+  // speed is between 0 and 255
+  analogWrite(ENA,lspeed);
+  analogWrite(ENB,rspeed);   
+}
+
+// keeps track of passed time without using delay
+boolean canContinue() {
+  if (delayTill > millis()) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+void randomDrive() {
+  
+  // turn
+  if (canContinue()) {
+    int turnDuration = random(250, 1000);   // turn for between 1/4 and 1 seconds
+    int turnDirection = random(0,2);        // random direction to turn in 
+    if (turnDirection == 0) {
+      turnLeft(turnDuration);
+    } else {
+      turnRight(turnDuration);
+    }
+  }
+
+  //  drive
+  if (canContinue()) {
+    int driveDuration = random(500, 3000);  // drive durration between 1/2 and 3 seconds
+    int driveDirection = random(0, 2);      // forward or backward direction
+    if (driveDirection == 0) {
+      forward(driveDuration);
+    } else {
+      backward(driveDuration);
+    }
+  } 
+}
+
 void setup() {
   Serial.begin(9600);
+
+  // IR reciever setup
   pinMode(irPin, INPUT);  
   pinMode(buzzerPin, OUTPUT);  
   IR.enableIRIn();
+
+  // sets pins for motors
+  pinMode(IN1, OUTPUT); 
+  pinMode(IN2, OUTPUT); 
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT); 
+  pinMode(ENA, OUTPUT);  
+  pinMode(ENB, OUTPUT);
+
+  // sets speed of motor
+  setMotorSpeed(150,150);
 }
 
 void loop() {
-  IRtick();
+
+  // gets the IR code
+  irTick();
+
+  // triggers the alarm
   if (alarmTriggered & !alarmSounding) {
     alarmTick();
   }
 
-  // once the current and alarm times have been set at least once
+  // random driving if the alarm is sounding
+  if (alarmSounding) {
+    randomDrive();
+  }
+  
+  // runs after the current and alarm times have been set at least once
   if (currentSet) {
     
     // ms since the program started
@@ -267,8 +381,8 @@ void loop() {
     int m1 = (msInCurrentTime/60/1000 - (h1*10 + h2) * 60) / 10;
     int m2 = (msInCurrentTime/60/1000 - (h1*10 + h2) * 60) - m1*10;
     current = String(h1) + String(h2) + ":" + String(m1) + String(m2);
-    //Serial.println(current + " - " + String(msInCurrentTime)); // midnight is 86400000
 
+    // adjust down one day if the time has passed midnight
     if (msInCurrentTime >= 86400000) {
       dayAdjustment++;
     }
@@ -277,12 +391,5 @@ void loop() {
     if (alarmSet & currentSet & alarm == current & !alarmTriggered) {
       alarmTriggered = true;
     }
-    
   }
 }
-  
- 
-
-
-
-
