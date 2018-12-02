@@ -246,6 +246,7 @@ unsigned long msInSetCurrentTime = 0; // initial milliseconds in set current tim
 boolean alarmTriggered = false;
 boolean alarmSounding = false;
 unsigned long oneMinPastAlarm = 0;
+boolean testAlarm = false;
 
 // keeps track of time for motor movement
 unsigned long delayTill = 0;
@@ -338,6 +339,7 @@ void irTick() {
     }
     else if (IRresults.value == IR_D) {
        keyPressed("D");
+       
     }
     else if (IRresults.value == IR_L) {
        keyPressed("L");
@@ -462,6 +464,9 @@ void keyPressed(String key) {
       tone1.noTone();
       alarmTriggered = false;
       stopMotor();
+    }
+    else if (key == "D") {
+      testAlarm = true;
     }
   }
 }
@@ -612,9 +617,17 @@ void loop() {
     }
 
     // turn the alarm bolean on when needed
-    if (alarmSet & currentSet & alarm == current & !alarmTriggered & (millis() > oneMinPastAlarm) ) {
+    if ((alarmSet & currentSet & alarm == current & !alarmTriggered & millis() > oneMinPastAlarm) | testAlarm ) {
       oneMinPastAlarm = millis() + 60000;
       alarmTriggered = true;
     }
   }
+
+  // tests the alarm
+  if (testAlarm) {
+    testAlarm = false;
+    alarmTriggered = true;
+  }
+
+  
 }
