@@ -249,6 +249,7 @@ unsigned long oneMinPastAlarm = 0;
 
 // keeps track of time for motor movement
 unsigned long delayTill = 0;
+boolean lastActionTurn = false;
 
 // keeps track of time for the tone delay
 unsigned long delayTillNextTone = 0;
@@ -458,6 +459,7 @@ void keyPressed(String key) {
       doubleBeep();
     }
     else if (key == "O") {
+      tone1.noTone();
       alarmTriggered = false;
       stopMotor();
     }
@@ -524,7 +526,7 @@ boolean canContinue() {
 void randomDrive() {
   
   // turn
-  if (canContinue()) {
+  if (canContinue() & !lastActionTurn) {
     int turnDuration = random(250, 1000);   // turn for between 1/4 and 1 seconds
     int turnDirection = random(0,2);        // random direction to turn in 
     if (turnDirection == 0) {
@@ -532,10 +534,11 @@ void randomDrive() {
     } else {
       turnRight(turnDuration);
     }
+    lastActionTurn = true;
   }
 
   //  drive
-  if (canContinue()) {
+  else if (canContinue()) {
     int driveDuration = random(500, 3000);  // drive durration between 1/2 and 3 seconds
     int driveDirection = random(0, 2);      // forward or backward direction
     if (driveDirection == 0) {
@@ -543,6 +546,7 @@ void randomDrive() {
     } else {
       backward(driveDuration);
     }
+    lastActionTurn = false;
   } 
 }
 
