@@ -501,6 +501,8 @@ void keyPressed(String key) {
       doubleBeep();
     }
     else if (key == "O") {
+      testAlarm = false;
+      thisNote = 0;
       tone1.noTone();
       alarmTriggered = false;
       stopMotor();
@@ -637,7 +639,7 @@ void loop() {
   // triggers the alarm melody
   if (alarmTriggered) {
     continueMelody();
-  } else { // resets the melody if the alarm is off
+  } else if (!testAlarm) { // resets the melody if the alarm is off
     thisNote = 0;
   }
 
@@ -671,7 +673,7 @@ void loop() {
     }
 
     // turn the alarm bolean on when needed
-    if ((alarmSet & currentSet & alarm == current & !alarmTriggered & millis() > oneMinPastAlarm) | testAlarm ) {
+    if ( alarmSet & currentSet & alarm == current & !alarmTriggered & millis() > oneMinPastAlarm ) {
       oneMinPastAlarm = millis() + 60000;
       alarmTriggered = true;
     }
@@ -679,7 +681,6 @@ void loop() {
 
   // tests the alarm
   if (testAlarm) {
-    testAlarm = false;
-    alarmTriggered = true;
+    continueMelody();
   }
 }
