@@ -182,15 +182,38 @@ int noteDurationsAnnoying[] = {
 TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
 
 // keeps track of time for the tone delay
-unsigned long delayTill = 0;
+unsigned long delayTillNextTone = 0;
 boolean needsPause = false;
 
 int thisNote = 0;
 int lengthOfMelody = sizeof(noteDurations) / 2;    
+void continueMelody() {
+  int noteDuration = 1000 / noteDurations[thisNote];
+  if (canPlay() && !needsPause) {
+    // the length of the note is 1 second divided by the note type
+    if (melody[thisNote] != 0) {
+      tone1.tone(melody[thisNote]);
+    } else {
+      tone1.noTone();
+    }
+    delayTillNextTone = millis() + noteDuration;
+    needsPause = true;
+    // 30% pasue between notes
+  } else if (canPlay() && needsPause) {
+    tone1.noTone();
+    int pauseBetweenNotes = noteDuration * 0.30;
+    delayTillNextTone = millis() + pauseBetweenNotes;
+    needsPause = false;
+    ++thisNote;
+    if (thisNote == lengthOfMelody) {
+      thisNote = 0;
+    }
+  }
+}
 
 // keeps track of passed time without using delay
 boolean canPlay() {
-  if (delayTill > millis()) {
+  if (delayTillNextTone > millis()) {
     return false;
   } else {
     tone1.noTone();
@@ -204,25 +227,5 @@ void setup() {
 }
 
 void loop() {
-  int noteDuration = 1000 / noteDurations[thisNote];
-  if (canPlay() && !needsPause) {
-    // the length of the note is 1 second divided by the note type
-    if (melody[thisNote] != 0) {
-      tone1.tone(melody[thisNote]);
-    } else {
-      tone1.noTone();
-    }
-    delayTill = millis() + noteDuration;
-    needsPause = true;
-    // 30% pasue between notes
-  } else if (canPlay() && needsPause) {
-    tone1.noTone();
-    int pauseBetweenNotes = noteDuration * 0.30;
-    delayTill = millis() + pauseBetweenNotes;
-    needsPause = false;
-    ++thisNote;
-    if (thisNote == lengthOfMelody) {
-      thisNote = 0;
-    }
-  }
+  continueMelody();
 }
