@@ -90,24 +90,7 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 
-#define buzzerPin 9
-TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
-
-// keeps track of time for the tone delay
-unsigned long delayTill = 0;
-boolean needsPause = false;
-
-// keeps track of passed time without using delay
-boolean canPlay() {
-  if (delayTill > millis()) {
-    return false;
-  }
-  else {
-    tone1.noTone();
-    return true;
-  }
-}
-
+// mario themesong
 int melody[] = {
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
   0, NOTE_C7, NOTE_E7, 0,
@@ -134,7 +117,6 @@ int melody[] = {
   0, NOTE_E7, 0, NOTE_C7,
   NOTE_D7, NOTE_B6, 0, 0
 };
-
 int noteDurations[] = {
   12, 12, 12, 12,
   12, 12, 12, 12,
@@ -162,11 +144,61 @@ int noteDurations[] = {
   12, 12, 12, 12
 };
 
+// starwars
+int melodyStarwars[] = {
+   NOTE_D3, NOTE_D3, NOTE_D3, NOTE_G3, 
+   NOTE_D4, NOTE_C4, NOTE_B3, NOTE_A3, 
+   NOTE_G4, NOTE_D4, NOTE_C4, NOTE_B3, 
+   NOTE_A3, NOTE_G4, NOTE_D4, NOTE_C4, 
+   NOTE_B3, NOTE_C4, NOTE_A3 
+};
+int noteDurationsStarwars[] = {
+  6, 6, 6, 2, 
+  2, 6, 6, 6, 
+  2, 2, 6, 6, 
+  6, 2, 2, 6, 
+  6, 6, 1
+};
+
+// annoying tone
+int melodyAnnoying[] = { 
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+};
+int noteDurationsAnnoying[] = {
+  2, 2, 2, 2, 2, 2,
+  4, 4, 4, 4, 4, 4,
+  8, 8, 8, 8, 8, 8,
+  4, 4, 4, 4, 4, 4,
+  2, 2, 2, 2, 2, 2
+};
+
+#define buzzerPin 9
+TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
+
+// keeps track of time for the tone delay
+unsigned long delayTill = 0;
+boolean needsPause = false;
+
+// keeps track of passed time without using delay
+boolean canPlay() {
+  if (delayTill > millis()) {
+    return false;
+  } else {
+    tone1.noTone();
+    return true;
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   pinMode(buzzerPin, OUTPUT); 
 }
-
 
 void loop() {
 
