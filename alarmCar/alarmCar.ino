@@ -128,7 +128,7 @@ IRrecv IR(irPin);
 decode_results IRresults;
 
 // mario themesong
-int melody[] = {
+int melodyMario[] = {
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
   0, NOTE_C7, NOTE_E7, 0,
   NOTE_G7, 0, 0,  0,
@@ -154,7 +154,7 @@ int melody[] = {
   0, NOTE_E7, 0, NOTE_C7,
   NOTE_D7, NOTE_B6, 0, 0
 };
-int noteDurations[] = {
+int noteDurationsMario[] = {
   12, 12, 12, 12,
   12, 12, 12, 12,
   12, 12, 12, 12,
@@ -215,6 +215,10 @@ int noteDurationsAnnoying[] = {
   2, 2, 2, 2, 2, 2
 };
 
+// which melody to use
+int melodyToUse = 2;
+int numberOfMelodies = 3;
+
 // loads the tone library, needed for 
 TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
 
@@ -258,15 +262,37 @@ boolean needsPause = false;
 
 // needed for looping through the noted in the melody
 int thisNote = 0;
-int lengthOfMelody = sizeof(noteDurations) / 2;
+int lengthOfMelody;
 
 // plays the next note of the melody, if canPlay is true
 void continueMelody() {
-  int noteDuration = 1000 / noteDurations[thisNote];
+  int noteDuration;
+  
+  // handles the length
+  if (melodyToUse == 1) {
+    lengthOfMelody = sizeof(noteDurationsMario) / 2;
+    noteDuration = 1000 / noteDurationsMario[thisNote];
+  } else if (melodyToUse == 2) {
+    lengthOfMelody = sizeof(noteDurationsStarwars) / 2;
+    noteDuration = 1000 / noteDurationsStarwars[thisNote];
+  } else if (melodyToUse == 3) {
+    lengthOfMelody = sizeof(noteDurationsAnnoying) / 2;
+    noteDuration = 1000 / noteDurationsAnnoying[thisNote];
+  }
+  
   if (canPlay() && !needsPause) {
+    int note;
+    if (melodyToUse == 1) {
+      note = melodyMario[thisNote];
+    } else if (melodyToUse == 2) {
+      note = melodyStarwars[thisNote];
+    } else if (melodyToUse == 3) {
+      note = melodyAnnoying[thisNote];
+    }
+    
     // the length of the note is 1 second divided by the note type
-    if (melody[thisNote] != 0) {
-      tone1.tone(melody[thisNote]);
+    if (note != 0) {
+      tone1.tone(note);
     } else {
       tone1.noTone();
     }
@@ -378,6 +404,20 @@ void doubleBeep() {
   tone1.noTone ();
 }
 
+void changeBeep() {
+  tone1.tone (600);
+  delay (50);
+  tone1.noTone ();
+  delay (25);
+  tone1.tone (650);
+  delay (50);
+  tone1.noTone ();
+  delay (25);
+  tone1.tone (700);
+  delay (50);
+  tone1.noTone ();
+}
+
 void keyPressed(String key) {
 
   // set alarm time
@@ -467,6 +507,20 @@ void keyPressed(String key) {
     }
     else if (key == "D") {
       testAlarm = true;
+    }
+    else if (key == "L") {
+      melodyToUse = melodyToUse - 1;
+      if (melodyToUse == 0) {
+        melodyToUse = numberOfMelodies;
+      }
+      changeBeep();
+    }
+    else if (key == "R") {
+      melodyToUse = melodyToUse + 1;
+      if (melodyToUse > numberOfMelodies) {
+        melodyToUse = 1;
+      }  
+      changeBeep();
     }
   }
 }
@@ -628,6 +682,4 @@ void loop() {
     testAlarm = false;
     alarmTriggered = true;
   }
-
-  
 }
