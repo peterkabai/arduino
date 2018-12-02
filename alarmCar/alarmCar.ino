@@ -418,6 +418,7 @@ void keyPressed(String key) {
       alarm = alarm1 + alarm2 + ":" + alarm3 + alarm4;
       Serial.println("Alarm set to: " + alarm);
       alarmSet = true;
+      oneMinPastAlarm = 0;
       doubleBeep();
     }
     else if (valueSet == 0 && which == "current") {
@@ -452,8 +453,9 @@ void keyPressed(String key) {
       int c3 = current3.toInt();
       int c4 = current4.toInt();
       msInSetCurrentTime = c1*10*60*60*1000L + c2*60*60*1000L + c3*10*60*1000L + c4*60*1000L;
-      doubleBeep();
       currentSet = true;
+      oneMinPastAlarm = 0;
+      doubleBeep();
     }
     else if (key == "O") {
       alarmTriggered = false;
