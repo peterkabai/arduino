@@ -91,7 +91,7 @@
 #define NOTE_DS8 4978
 
 // mario themesong
-int melody[] = {
+int melodyMario[] = {
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
   0, NOTE_C7, NOTE_E7, 0,
   NOTE_G7, 0, 0,  0,
@@ -117,7 +117,7 @@ int melody[] = {
   0, NOTE_E7, 0, NOTE_C7,
   NOTE_D7, NOTE_B6, 0, 0
 };
-int noteDurations[] = {
+int noteDurationsMario[] = {
   12, 12, 12, 12,
   12, 12, 12, 12,
   12, 12, 12, 12,
@@ -165,18 +165,17 @@ int melodyAnnoying[] = {
   NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
   NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
   NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
-  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
-  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
-  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
-  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6,
+  NOTE_D3, NOTE_AS3, NOTE_FS4, NOTE_D5, NOTE_AS5, NOTE_FS6
 };
 int noteDurationsAnnoying[] = {
-  2, 2, 2, 2, 2, 2,
   4, 4, 4, 4, 4, 4,
   8, 8, 8, 8, 8, 8,
-  4, 4, 4, 4, 4, 4,
-  2, 2, 2, 2, 2, 2
+  16, 16, 16, 16, 16, 16,
+  8, 8, 8, 8, 8, 8,
 };
+
+// which melody to use
+int melodyToUse = 3;
 
 #define buzzerPin 9
 TonePlayer tone1 (TCCR1A, TCCR1B, OCR1AH, OCR1AL, TCNT1H, TCNT1L);
@@ -186,13 +185,36 @@ unsigned long delayTillNextTone = 0;
 boolean needsPause = false;
 
 int thisNote = 0;
-int lengthOfMelody = sizeof(noteDurations) / 2;    
+int lengthOfMelody;
+    
 void continueMelody() {
-  int noteDuration = 1000 / noteDurations[thisNote];
+  int noteDuration;
+
+  // handles the length
+  if (melodyToUse == 1) {
+    lengthOfMelody = sizeof(noteDurationsMario) / 2;
+    noteDuration = 1000 / noteDurationsMario[thisNote];
+  } else if (melodyToUse == 2) {
+    lengthOfMelody = sizeof(noteDurationsStarwars) / 2;
+    noteDuration = 1000 / noteDurationsStarwars[thisNote];
+  } else if (melodyToUse == 3) {
+    lengthOfMelody = sizeof(noteDurationsAnnoying) / 2;
+    noteDuration = 1000 / noteDurationsAnnoying[thisNote];
+  }
+  
   if (canPlay() && !needsPause) {
     // the length of the note is 1 second divided by the note type
-    if (melody[thisNote] != 0) {
-      tone1.tone(melody[thisNote]);
+    int note;
+    if (melodyToUse == 1) {
+      note = melodyMario[thisNote];
+    } else if (melodyToUse == 2) {
+      note = melodyStarwars[thisNote];
+    } else if (melodyToUse == 3) {
+      note = melodyAnnoying[thisNote];
+    }
+    
+    if (note != 0) {
+      tone1.tone(note);
     } else {
       tone1.noTone();
     }
