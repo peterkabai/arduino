@@ -252,6 +252,7 @@ boolean alarmTriggered = false;
 boolean alarmSounding = false;
 unsigned long oneMinPastAlarm = 0;
 boolean testAlarm = false;
+boolean testDriving = false;
 
 // keeps track of time for motor movement
 unsigned long delayTill = 0;
@@ -503,10 +504,14 @@ void keyPressed(String key) {
     }
     else if (key == "O") {
       testAlarm = false;
+      testDriving = false;
       thisNote = 0;
       tone1.noTone();
       alarmTriggered = false;
       stopMotor();
+    }
+    else if (key == "U") {
+      testDriving = true;
     }
     else if (key == "D") {
       testAlarm = true;
@@ -601,7 +606,7 @@ void randomDrive() {
 
   //  drive
   else if (canContinue()) {
-    int driveDuration = random(500, 3000);  // drive durration between 1/2 and 3 seconds
+    int driveDuration = random(1000, 3000);  // drive durration between 1 and 3 seconds
     int driveDirection = random(0, 2);      // forward or backward direction
     if (driveDirection == 0) {
       forward(driveDuration);
@@ -655,6 +660,11 @@ void loop() {
 
   // random driving if the alarm is sounding
   if (alarmTriggered) {
+    randomDrive();
+  }
+
+  // for testing the alarm driving code
+  if (testDriving) {
     randomDrive();
   }
   
