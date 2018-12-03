@@ -3,8 +3,8 @@ int buttonPin = 1;
 int frequency = 200; 
 
 void setup() {
-  pinMode(pinNumber, INPUT);
-  digitalWrite(pinNumber, HIGH);
+  pinMode(buttonPin, INPUT);
+  digitalWrite(buttonPin, HIGH);
 }
 
 void loop() {
