@@ -6,6 +6,7 @@
 // sets pins
 #define irPin 4
 #define buzzerPin 9
+#define buttonPin 1
 #define IN1  7  // K1 motor direction
 #define IN2  8  // K1 motor direction
 #define IN3  11 // K3 motor direction
@@ -629,12 +630,21 @@ void setup() {
 
   // sets speed of motor
   setMotorSpeed(150,150);
+
+  // for initializing button pins
+  pinMode(buttonPin, INPUT);
+  digitalWrite(buttonPin, HIGH);
 }
 
 void loop() {
 
   // gets the IR code
   irTick();
+
+  // simulates ok button on remote using the button
+  if (digitalRead(buttonPin) == LOW) {
+    keyPressed("O");
+  }
 
   // triggers the alarm melody
   if (alarmTriggered) {
