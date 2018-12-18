@@ -367,7 +367,6 @@ void irTick() {
     }
     else if (IRresults.value == IR_D) {
        keyPressed("D");
-       
     }
     else if (IRresults.value == IR_L) {
        keyPressed("L");
@@ -424,37 +423,67 @@ void keyPressed(String key) {
 
   // set alarm time
   if (key == "*") {
+    keyPressed("O");
     which = "alarm";
     valueSet = 0;
     Serial.println("Now setting alarm...");
     startBeep();
-  }
-  else if (key == "#") {
+  } else if (key == "#") {
+    keyPressed("O");
     which = "current";
     valueSet = 0;
     Serial.println("Now setting current time...");
     startBeep();
-  }
-  else {
+  } else if (key == "O") {
+    which = "";
+    valueSet = 0;
+    testAlarm = false;
+    testDriving = false;
+    thisNote = 0;
+    tone1.noTone();
+    alarmTriggered = false;
+    stopMotor();
+  } else if (key == "U") {
+    which = "";
+    valueSet = 0;
+    testDriving = true;
+  } else if (key == "D") {
+    which = "";
+    valueSet = 0;
+    testAlarm = true;
+  } else if (key == "L") {
+    which = "";
+    valueSet = 0;
+    melodyToUse = melodyToUse - 1;
+    if (melodyToUse == 0) {
+      melodyToUse = numberOfMelodies;
+    }
+    changeBeep();
+  } else if (key == "R") {
+    which = "";
+    valueSet = 0;
+    melodyToUse = melodyToUse + 1;
+    if (melodyToUse > numberOfMelodies) {
+      melodyToUse = 1;
+    }  
+    changeBeep();
+  } else {
     if (valueSet == 0 && which == "alarm") {
       alarm1 = key;
       valueSet = 1;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 1 && which == "alarm") {
+    } else if (valueSet == 1 && which == "alarm") {
       alarm2 = key;
       valueSet = 2;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 2 && which == "alarm") {
+    } else if (valueSet == 2 && which == "alarm") {
       alarm3 = key;
       valueSet = 3;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 3 && which == "alarm") {
+    } else if (valueSet == 3 && which == "alarm") {
       alarm4 = key;
       valueSet = 0;
       which = "";
@@ -465,26 +494,22 @@ void keyPressed(String key) {
       alarmSet = true;
       oneMinPastAlarm = 0;
       doubleBeep();
-    }
-    else if (valueSet == 0 && which == "current") {
+    } else if (valueSet == 0 && which == "current") {
       current1 = key;
       valueSet = 1;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 1 && which == "current") {
+    } else if (valueSet == 1 && which == "current") {
       current2 = key;
       valueSet = 2;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 2 && which == "current") {
+    } else if (valueSet == 2 && which == "current") {
       current3 = key;
       valueSet = 3;
       Serial.println(key);
       beep();
-    }
-    else if (valueSet == 3 && which == "current") {
+    } else if (valueSet == 3 && which == "current") {
       current4 = key;
       valueSet = 0;
       which = "";
@@ -501,34 +526,6 @@ void keyPressed(String key) {
       currentSet = true;
       oneMinPastAlarm = 0;
       doubleBeep();
-    }
-    else if (key == "O") {
-      testAlarm = false;
-      testDriving = false;
-      thisNote = 0;
-      tone1.noTone();
-      alarmTriggered = false;
-      stopMotor();
-    }
-    else if (key == "U") {
-      testDriving = true;
-    }
-    else if (key == "D") {
-      testAlarm = true;
-    }
-    else if (key == "L") {
-      melodyToUse = melodyToUse - 1;
-      if (melodyToUse == 0) {
-        melodyToUse = numberOfMelodies;
-      }
-      changeBeep();
-    }
-    else if (key == "R") {
-      melodyToUse = melodyToUse + 1;
-      if (melodyToUse > numberOfMelodies) {
-        melodyToUse = 1;
-      }  
-      changeBeep();
     }
   }
 }
@@ -692,9 +689,11 @@ void loop() {
       dayAdjustment++;
     }
 
+    
     // turn the alarm bolean on when needed
     if ( alarmSet & currentSet & alarm == current & !alarmTriggered & millis() > oneMinPastAlarm ) {
       oneMinPastAlarm = millis() + 60000;
+      
       alarmTriggered = true;
     }
   }
