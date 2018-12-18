@@ -688,12 +688,10 @@ void loop() {
     if (msInCurrentTime >= 86400000) {
       dayAdjustment++;
     }
-
     
     // turn the alarm bolean on when needed
     if ( alarmSet & currentSet & alarm == current & !alarmTriggered & millis() > oneMinPastAlarm ) {
       oneMinPastAlarm = millis() + 60000;
-      
       alarmTriggered = true;
     }
   }
