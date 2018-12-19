@@ -5,9 +5,19 @@ struct VarObject {
   String two;
 };
 
+// clears EEPROM 
+void clearMemory() {
+  for (int i = 0 ; i < EEPROM.length() ; i++) {
+    EEPROM.write(i, 0);
+  }
+}
+
 void setup() {
   Serial.begin(9600);
 
+  // clears EEPROM 
+  clearMemory();
+  
   // create a float, store it
   float f = 123.456f;
   EEPROM.put(0, f);
