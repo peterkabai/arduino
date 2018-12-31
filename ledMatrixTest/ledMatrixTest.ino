@@ -15,13 +15,11 @@ void loop() {
   for(int y=0; y<LEDs; y++){  
     // for each column of LEDs
     for(int x=0; x<LEDs; x++){   
-
       mled.dot(x,y);   // draw dot      
       mled.display();  // display dot
-      delay(200);      
+      delay(100);      
       mled.dot(x,y,0); // clear dot     
       mled.display();
-      delay(200);
      }
    } 
 }
